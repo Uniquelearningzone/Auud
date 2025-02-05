@@ -23,13 +23,41 @@
         .token {
             width: 3in;
             height: 1.5in;
-            border: 2px solid black;
+            border: 4px double black; /* ডাবল লাইন বর্ডার */
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            font-size: 24px;
+            justify-content: space-between;
+            font-size: 20px;
             font-weight: bold;
             margin: 5px;
+            position: relative;
+            padding: 5px;
+        }
+        .token::after {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: black;
+            top: 50%;
+            left: 0;
+        }
+        .token-part {
+            width: 100%;
+            text-align: center;
+        }
+        .event-title {
+            font-size: 18px;
+            margin: 2px 0;
+        }
+        .serial-number {
+            font-size: 22px;
+            font-weight: bold;
+        }
+        .random-number {
+            font-size: 20px;
+            color: darkred;
         }
         #download-btn {
             margin-top: 20px;
@@ -49,14 +77,33 @@
     <button id="download-btn">📥 ডাউনলোড</button>
 
     <script>
+        function generateRandomNumber() {
+            let num = Math.floor(100000 + Math.random() * 900000); // ৬ ডিজিটের সংখ্যা
+            return num.toString().split('').map(n => "০১২৩৪৫৬৭৮৯"[n]).join(''); // বাংলায় রূপান্তর
+        }
+
         function generateTokens() {
             let container = document.getElementById("token-container");
             container.innerHTML = "";
-            let tokensPerPage = Math.floor((297 - 20) / (1.5 * 25.4)) * Math.floor((210 - 20) / (3 * 25.4)); // টোকেনের সংখ্যা গণনা
+            let tokensPerPage = Math.floor((297 - 20) / (1.5 * 25.4)) * Math.floor((210 - 20) / (3 * 25.4)); // সর্বোচ্চ কতটি টোকেন এক পেজে আসবে
+            let usedNumbers = new Set(); // ইউনিক নম্বর রাখতে
+
             for (let i = 1; i <= tokensPerPage; i++) {
                 let token = document.createElement("div");
                 token.classList.add("token");
-                token.innerText = (i < 10 ? "0" : "") + i;
+
+                let serialNumber = (i < 10 ? "0" : "") + i;
+                let randomNumber;
+                do {
+                    randomNumber = generateRandomNumber();
+                } while (usedNumbers.has(randomNumber)); // ডুপ্লিকেট চেক
+                usedNumbers.add(randomNumber);
+
+                token.innerHTML = `
+                    <div class="token-part serial-number">🔢 ${serialNumber}</div>
+                    <div class="token-part event-title">🎉 চড়ুইভাতি ২০২৫ 🎉</div>
+                    <div class="token-part random-number"># ${randomNumber}</div>
+                `;
                 container.appendChild(token);
             }
         }
