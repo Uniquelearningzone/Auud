@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>টোকেন জেনারেটর</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        #token-container {
+            width: 210mm; /* A4 Width */
+            height: 297mm; /* A4 Height */
+            border: 2px solid black;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            padding: 10mm;
+        }
+        .token {
+            width: 3in;
+            height: 1.5in;
+            border: 2px solid black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 5px;
+        }
+        #download-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>টোকেন জেনারেটর</h2>
+    <div id="token-container"></div>
+    <button id="download-btn">📥 ডাউনলোড</button>
+
+    <script>
+        function generateTokens() {
+            let container = document.getElementById("token-container");
+            container.innerHTML = "";
+            let tokensPerPage = Math.floor((297 - 20) / (1.5 * 25.4)) * Math.floor((210 - 20) / (3 * 25.4)); // টোকেনের সংখ্যা গণনা
+            for (let i = 1; i <= tokensPerPage; i++) {
+                let token = document.createElement("div");
+                token.classList.add("token");
+                token.innerText = (i < 10 ? "0" : "") + i;
+                container.appendChild(token);
+            }
+        }
+
+        function downloadPDF() {
+            html2canvas(document.getElementById("token-container")).then(canvas => {
+                let imgData = canvas.toDataURL("image/png");
+                let { jsPDF } = window.jspdf;
+                let pdf = new jsPDF("p", "mm", "a4");
+                pdf.addImage(imgData, "PNG", 0, 0, 210, 297);
+                pdf.save("tokens.pdf");
+            });
+        }
+
+        document.getElementById("download-btn").addEventListener("click", downloadPDF);
+
+        generateTokens();
+    </script>
+
+</body>
+</html>
