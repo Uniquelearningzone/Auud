@@ -10,30 +10,35 @@
         body {
             font-family: Arial, sans-serif;
             text-align: center;
+            margin: 0;
+            padding: 0;
         }
-        #token-container {
+        .a4-frame {
             width: 210mm; /* A4 Width */
             height: 297mm; /* A4 Height */
-            border: 2px solid black;
+            border: 3px solid black;
             display: flex;
             flex-wrap: wrap;
             justify-content: space-around;
             padding: 10mm;
-            box-sizing: border-box;
+            margin: 10px auto;
+            background: white;
+            position: relative;
         }
         .token {
-            width: 73mm; /* 3 inch */
-            height: 37mm; /* 1.5 inch */
+            width: 64mm; /* 3 inch */
+            height: 32mm; /* 1.5 inch */
             border: 4px double black;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             margin: 2mm;
             position: relative;
             padding: 5px;
             box-sizing: border-box;
+            text-align: center;
         }
         .token::after {
             content: "";
@@ -46,11 +51,10 @@
         }
         .token-part {
             width: 100%;
-            text-align: center;
             padding: 3px 0;
         }
         .event-title {
-            font-size: 16px;
+            font-size: 14px;
         }
         .random-number {
             font-size: 18px;
@@ -70,7 +74,7 @@
 <body>
 
     <h2>টোকেন জেনারেটর</h2>
-    <div id="token-container"></div>
+    <div id="a4-container" class="a4-frame"></div>
     <button id="download-btn">📥 ডাউনলোড</button>
 
     <script>
@@ -80,7 +84,7 @@
         }
 
         function generateTokens() {
-            let container = document.getElementById("token-container");
+            let container = document.getElementById("a4-container");
             container.innerHTML = "";
             let rows = 8;  // এক পেজে ৮ সারি থাকবে
             let cols = 3;  // এক সারিতে ৩টি টোকেন থাকবে
@@ -112,7 +116,8 @@
         }
 
         function downloadPDF() {
-            html2canvas(document.getElementById("token-container")).then(canvas => {
+            let container = document.getElementById("a4-container");
+            html2canvas(container, { scale: 2 }).then(canvas => {
                 let imgData = canvas.toDataURL("image/png");
                 let { jsPDF } = window.jspdf;
                 let pdf = new jsPDF("p", "mm", "a4");
