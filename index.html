@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>টোকেন জেনারেটর</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -13,8 +12,8 @@
             background: #f2f2f2;
         }
         .a4-frame {
-            width: 210mm; /* A4 Width */
-            height: 297mm; /* A4 Height */
+            width: 210mm;
+            height: 297mm;
             border: 3px solid black;
             display: flex;
             flex-wrap: wrap;
@@ -49,9 +48,6 @@
         .token-part {
             width: 100%;
             padding: 5px 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
         }
         .event-title {
             font-size: 12px;
@@ -81,11 +77,11 @@
 </head>
 <body>
 
-    <h2>টোকেন জেনারেটর</h2>
+    <h2>🎟 টোকেন জেনারেটর 🎟</h2>
     <div id="a4-container" class="a4-frame"></div>
     
     <div class="button-container">
-        <button id="download-btn">📥 ডাউনলোড</button>
+        <button id="download-btn">📥 JPG ডাউনলোড</button>
         <button id="more-btn">🔄 More</button>
     </div>
 
@@ -94,15 +90,13 @@
         let usedNumbers = new Set();
 
         function askTokenSize() {
-            tokenHeight = parseFloat(prompt("টোকেনের দৈর্ঘ্য লিখুন (সেন্টিমিটারে, যেমন ৮)"), 10);
-            tokenWidth = parseFloat(prompt("টোকেনের প্রস্থ লিখুন (সেন্টিমিটারে, যেমন ৪)"), 10);
+            tokenWidth = parseFloat(prompt("টোকেনের প্রস্থ লিখুন (সেন্টিমিটারে, যেমন ৪ cm)"));
+            tokenHeight = parseFloat(prompt("টোকেনের লম্বা লিখুন (সেন্টিমিটারে, যেমন ৮ cm)"));
 
             if (isNaN(tokenWidth) || isNaN(tokenHeight) || tokenWidth <= 0 || tokenHeight <= 0) {
                 alert("সঠিক সংখ্যা লিখুন!");
                 askTokenSize();
             } else {
-                tokenWidth *= 10;  // Convert to mm
-                tokenHeight *= 10; // Convert to mm
                 generateTokens();
             }
         }
@@ -119,15 +113,15 @@
         function generateTokens() {
             let container = document.getElementById("a4-container");
             container.innerHTML = "";
-            let rows = Math.floor(297 / (tokenHeight + 4));  // A4 পৃষ্ঠা অনুযায়ী সারি হিসাব
-            let cols = Math.floor(210 / (tokenWidth + 4));  // A4 পৃষ্ঠা অনুযায়ী কলাম হিসাব
+            let rows = Math.floor(29.7 / (tokenHeight + 0.4));  
+            let cols = Math.floor(21.0 / (tokenWidth + 0.4));  
             let totalTokens = rows * cols;
 
             for (let i = 0; i < totalTokens; i++) {
                 let token = document.createElement("div");
                 token.classList.add("token");
-                token.style.width = `${tokenWidth}mm`;
-                token.style.height = `${tokenHeight}mm`;
+                token.style.width = `${tokenWidth}cm`;
+                token.style.height = `${tokenHeight}cm`;
 
                 let randomNumber = generateRandomNumber();
 
@@ -145,18 +139,20 @@
             }
         }
 
-        function downloadPDF() {
+        function downloadJPG() {
             let container = document.getElementById("a4-container");
             html2canvas(container, { scale: 2 }).then(canvas => {
-                let imgData = canvas.toDataURL("image/png");
-                let { jsPDF } = window.jspdf;
-                let pdf = new jsPDF("p", "mm", "a4");
-                pdf.addImage(imgData, "PNG", 0, 0, 210, 297);
-                pdf.save("tokens.pdf");
+                let imgData = canvas.toDataURL("image/jpeg");
+                let link = document.createElement("a");
+                link.href = imgData;
+                link.download = "tokens.jpg";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
             });
         }
 
-        document.getElementById("download-btn").addEventListener("click", downloadPDF);
+        document.getElementById("download-btn").addEventListener("click", downloadJPG);
         document.getElementById("more-btn").addEventListener("click", generateTokens);
 
         askTokenSize();
