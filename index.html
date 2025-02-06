@@ -28,7 +28,8 @@
             border: 4px double black;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: center;
+            align-items: center;
             font-size: 16px;
             font-weight: 600;
             font-family: "Hind Siliguri", serif;
@@ -37,15 +38,6 @@
             padding: 5px;
             box-sizing: border-box;
             text-align: center;
-        }
-        .token::after {
-            content: "";
-            position: absolute;
-            width: 100%;
-            height: 2px;
-            background: black;
-            top: 50%;
-            left: 0;
         }
         .token-part {
             width: 100%;
@@ -162,10 +154,6 @@
                 let serialNumberText = generateSerialNumber();
 
                 token.innerHTML = `
-                    <div class="token-part">
-                        <div class="event-title">🎉 চড়ুইভাতি ২০২৫ 🎉</div>
-                        <div class="random-number">টোকেন নং: ${serialNumberText}</div>
-                    </div>
                     <div class="token-part">
                         <div class="event-title">🎉 চড়ুইভাতি ২০২৫ 🎉</div>
                         <div class="random-number">টোকেন নং: ${serialNumberText}</div>
