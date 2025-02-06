@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>টোকেন জেনারেটর</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap');
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: "Hind Siliguri", serif;
             text-align: center;
             background: #f2f2f2;
         }
@@ -28,8 +29,9 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            font-size: 14px;
-            font-weight: bold;
+            font-size: 16px;
+            font-weight: 600;
+            font-family: "Hind Siliguri", serif;
             margin: 2mm;
             position: relative;
             padding: 5px;
@@ -50,11 +52,13 @@
             padding: 5px 0;
         }
         .event-title {
-            font-size: 12px;
+            font-size: 14px;
+            font-weight: 700;
         }
         .random-number {
-            font-size: 16px;
+            font-size: 18px;
             color: darkred;
+            font-weight: 700;
         }
         .button-container {
             margin-top: 20px;
@@ -66,6 +70,7 @@
             color: white;
             border: none;
             cursor: pointer;
+            font-family: "Hind Siliguri", serif;
         }
         #download-btn {
             background-color: #28a745;
@@ -73,19 +78,40 @@
         #more-btn {
             background-color: #007bff;
         }
+        .input-container {
+            margin-top: 10px;
+        }
+        .input-container input {
+            padding: 10px;
+            font-size: 16px;
+            font-family: "Hind Siliguri", serif;
+        }
+        .input-container button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #17a2b8;
+        }
     </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
-
     <h2>🎟 টোকেন জেনারেটর 🎟</h2>
     <div id="a4-container" class="a4-frame"></div>
-    
+
     <div class="button-container">
         <button id="download-btn">📥 JPG ডাউনলোড</button>
         <button id="more-btn">🔄 More</button>
     </div>
 
+    <div class="input-container">
+        <input type="number" id="token-count" placeholder="কয়টা টোকেন লাগবে?">
+        <button id="ok-btn">OK</button>
+    </div>
+
     <script>
+        const { jsPDF } = window.jspdf;
         let tokenWidth, tokenHeight;
         let usedNumbers = new Set();
 
@@ -104,18 +130,22 @@
         function generateRandomNumber() {
             let num;
             do {
-                num = Math.floor(100000 + Math.random() * 900000);
+                num = Math.floor(10000000 + Math.random() * 90000000);
             } while (usedNumbers.has(num));
             usedNumbers.add(num);
             return num.toString().split('').map(n => "০১২৩৪৫৬৭৮৯"[n]).join('');
         }
 
-        function generateTokens() {
+        function generateTokens(count = null) {
             let container = document.getElementById("a4-container");
             container.innerHTML = "";
             let rows = Math.floor(29.7 / (tokenHeight + 0.4));  
             let cols = Math.floor(21.0 / (tokenWidth + 0.4));  
             let totalTokens = rows * cols;
+
+            if (count) {
+                totalTokens = count;
+            }
 
             for (let i = 0; i < totalTokens; i++) {
                 let token = document.createElement("div");
@@ -128,11 +158,11 @@
                 token.innerHTML = `
                     <div class="token-part">
                         <div class="event-title">🎉 চড়ুইভাতি ২০২৫ 🎉</div>
-                        <div class="random-number"># ${randomNumber}</div>
+                        <div class="random-number">টোকেন নং: ${randomNumber}</div>
                     </div>
                     <div class="token-part">
                         <div class="event-title">🎉 চড়ুইভাতি ২০২৫ 🎉</div>
-                        <div class="random-number"># ${randomNumber}</div>
+                        <div class="random-number">টোকেন নং: ${randomNumber}</div>
                     </div>
                 `;
                 container.appendChild(token);
@@ -152,11 +182,42 @@
             });
         }
 
+        function downloadPDF() {
+            let tokenCount = parseInt(document.getElementById("token-count").value);
+            if (isNaN(tokenCount) || tokenCount <= 0) {
+                alert("সঠিক সংখ্যা লিখুন!");
+                return;
+            }
+
+            let rows = Math.floor(29.7 / (tokenHeight + 0.4));  
+            let cols = Math.floor(21.0 / (tokenWidth + 0.4));  
+            let tokensPerPage = rows * cols;
+            let totalPages = Math.ceil(tokenCount / tokensPerPage);
+
+            let pdf = new jsPDF('p', 'mm', 'a4');
+            let container = document.getElementById("a4-container");
+
+            for (let page = 0; page < totalPages; page++) {
+                if (page > 0) {
+                    pdf.addPage();
+                }
+                container.innerHTML = "";
+                generateTokens(tokensPerPage);
+                html2canvas(container, { scale: 2 }).then(canvas => {
+                    let imgData = canvas.toDataURL("image/jpeg");
+                    pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
+                    if (page === totalPages - 1) {
+                        pdf.save("tokens.pdf");
+                    }
+                });
+            }
+        }
+
         document.getElementById("download-btn").addEventListener("click", downloadJPG);
-        document.getElementById("more-btn").addEventListener("click", generateTokens);
+        document.getElementById("more-btn").addEventListener("click", () => generateTokens());
+        document.getElementById("ok-btn").addEventListener("click", downloadPDF);
 
         askTokenSize();
     </script>
-
 </body>
 </html>
