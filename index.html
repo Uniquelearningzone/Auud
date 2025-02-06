@@ -182,7 +182,7 @@
             });
         }
 
-        function downloadPDF() {
+        async function downloadPDF() {
             let tokenCount = parseInt(document.getElementById("token-count").value);
             if (isNaN(tokenCount) || tokenCount <= 0) {
                 alert("সঠিক সংখ্যা লিখুন!");
@@ -203,14 +203,18 @@
                 }
                 container.innerHTML = "";
                 generateTokens(tokensPerPage);
-                html2canvas(container, { scale: 2 }).then(canvas => {
-                    let imgData = canvas.toDataURL("image/jpeg");
-                    pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
-                    if (page === totalPages - 1) {
-                        pdf.save("tokens.pdf");
-                    }
+
+                // Wait for the canvas to render
+                await new Promise((resolve) => {
+                    html2canvas(container, { scale: 2 }).then(canvas => {
+                        let imgData = canvas.toDataURL("image/jpeg");
+                        pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
+                        resolve();
+                    });
                 });
             }
+
+            pdf.save("tokens.pdf");
         }
 
         document.getElementById("download-btn").addEventListener("click", downloadJPG);
