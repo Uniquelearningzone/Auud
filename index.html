@@ -113,7 +113,7 @@
     <script>
         const { jsPDF } = window.jspdf;
         let tokenWidth, tokenHeight;
-        let usedNumbers = new Set();
+        let serialNumber = 0;
 
         function askTokenSize() {
             tokenWidth = parseFloat(prompt("টোকেনের প্রস্থ লিখুন (সেন্টিমিটারে, যেমন ৪ cm)"));
@@ -123,17 +123,23 @@
                 alert("সঠিক সংখ্যা লিখুন!");
                 askTokenSize();
             } else {
+                askSerialNumber();
+            }
+        }
+
+        function askSerialNumber() {
+            let serialInput = prompt("সিরিয়াল নাম্বারের উদাহরণ লিখুন (যেমন: ২০২৫১২৩৪)");
+            if (!serialInput || isNaN(serialInput)) {
+                alert("সঠিক সংখ্যা লিখুন!");
+                askSerialNumber();
+            } else {
+                serialNumber = parseInt(serialInput);
                 generateTokens();
             }
         }
 
-        function generateRandomNumber() {
-            let num;
-            do {
-                num = Math.floor(10000000 + Math.random() * 90000000);
-            } while (usedNumbers.has(num));
-            usedNumbers.add(num);
-            return num.toString().split('').map(n => "০১২৩৪৫৬৭৮৯"[n]).join('');
+        function generateSerialNumber() {
+            return (serialNumber++).toString().split('').map(n => "০১২৩৪৫৬৭৮৯"[n]).join('');
         }
 
         function generateTokens(count = null) {
@@ -153,16 +159,16 @@
                 token.style.width = `${tokenWidth}cm`;
                 token.style.height = `${tokenHeight}cm`;
 
-                let randomNumber = generateRandomNumber();
+                let serialNumberText = generateSerialNumber();
 
                 token.innerHTML = `
                     <div class="token-part">
                         <div class="event-title">🎉 চড়ুইভাতি ২০২৫ 🎉</div>
-                        <div class="random-number">টোকেন নং: ${randomNumber}</div>
+                        <div class="random-number">টোকেন নং: ${serialNumberText}</div>
                     </div>
                     <div class="token-part">
                         <div class="event-title">🎉 চড়ুইভাতি ২০২৫ 🎉</div>
-                        <div class="random-number">টোকেন নং: ${randomNumber}</div>
+                        <div class="random-number">টোকেন নং: ${serialNumberText}</div>
                     </div>
                 `;
                 container.appendChild(token);
